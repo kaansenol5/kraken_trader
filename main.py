@@ -57,7 +57,7 @@ class TraderBot():
 
     def check_open_orders(self):
         result = self.kraken.query_private("OpenOrders")
-        logging.info("Checked open orders.")
+        #logging.info("Checked open orders.")
         try:
             return result["result"]["open"]
         except KeyError:
@@ -66,6 +66,7 @@ class TraderBot():
                 print("rate limited, waiting 15 minutes")
                 time.sleep(900)
             return result["error"]
+
 
     def place_order(self, type, order_type, price, volume, leverage, expire_time="0"):
         result = self.kraken.query_private("AddOrder",{"pair":self.pair,"type":type, "ordertype":order_type, "price":price, "volume":volume, "expiretm":expire_time,"leverage":leverage})
@@ -110,7 +111,6 @@ class TraderBot():
 
 
                     while buy_order_transaction_id in list(self.check_open_orders()):
-                        print("aaa")
                         time.sleep(4)
 
                     if buy_order_transaction_id not in list(self.check_open_orders()):
@@ -127,7 +127,7 @@ class TraderBot():
 
                             while sell_order_transaction_id in list(self.check_open_orders()):
                                 if float(self.check_ticker(self.pair)) > stop_loss_price:
-                                    print("wara")
+                                    pass
 
                                 else:
                                     self.cancel_order(sell_order_transaction_id)
