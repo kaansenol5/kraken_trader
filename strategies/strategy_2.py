@@ -24,7 +24,7 @@ def strategy(bot):
         if difference < 0:
             if float(balance[bot.fiat]) > 0.02 / ticker_current:
                 print("AAA")
-                if average_price / 100 * 98 >= ticker_current:
+                if average_price - average_price/100*bot.profit >= ticker_current:
 
                     amount_to_buy = float(balance[bot.fiat]) / ticker_current / 100 * bot.risk_management
                     buy_price = ticker_current
@@ -35,7 +35,7 @@ def strategy(bot):
         elif difference > 0:
 
             if float(balance[bot.coin]) > 0.02:
-                if average_price / 100 * 102 <= ticker_current:
+                if average_price + average_price / 100 * bot.profit <= ticker_current:
                     amount_to_sell = balance[bot.coin]
                     sell_price = ticker_current
                     if sell_price > buy_price / 100 * 102:
