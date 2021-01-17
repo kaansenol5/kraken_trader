@@ -6,12 +6,14 @@ import json
 import logging
 import strategies.strategy_1
 import strategies.strategy_2
-open("log.txt","w+").close()
-logging.basicConfig(format="%(asctime)s %(message)s", filename='log.txt', level=logging.INFO)
 
 
 class TraderBot():
     def __init__(self):
+        open("log.txt", "w+").close()
+
+        logging.basicConfig(format="%(asctime)s %(message)s", filename='log.txt', level=logging.INFO)
+
         config_file = open("config.json")
         key_file = open("keys.json")
 
@@ -41,7 +43,7 @@ class TraderBot():
 
     def check_balance(self):
         result = self.kraken.query_private("Balance")
-        logging.info("Checked balance.")
+        logging.debug("Checked balance.")
         try:
             return result["result"]
         except KeyError:
@@ -50,7 +52,7 @@ class TraderBot():
 
     def check_ticker(self,pair):
         result = (self.kraken.query_public("Ticker",{"pair":f"{pair}"}))
-        logging.info(f"Checked {pair}.")
+        logging.debug(f"Checked {pair}.")
 
         try:
             return result["result"]
@@ -65,7 +67,7 @@ class TraderBot():
 
     def check_open_orders(self):
         result = self.kraken.query_private("OpenOrders")
-        #logging.info("Checked open orders.")
+        logging.debug("Checked open orders.")
         try:
             return result["result"]["open"]
         except KeyError:
@@ -92,7 +94,7 @@ class TraderBot():
 
     def cancel_order(self, txid):
         result = self.kraken.query_private("CancelOrder",{"txid":txid})
-        logging.info(f"Cancelled order {txid}")
+        logging.debug(f"Cancelled order {txid}")
         return result
 
 

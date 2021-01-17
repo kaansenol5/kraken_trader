@@ -1,12 +1,15 @@
 import logging, time
 
+logging.basicConfig(format="%(asctime)s %(message)s", filename='log.txt', level=logging.INFO)
+
 
 def strategy(bot):
+    logging.info("strategy_2 started")
+    buy_price = 0
     while True:
         ticker_info = bot.check_ticker(bot.pair)
         balance = bot.check_balance()
-        print(balance)
-        print(ticker_info)
+
         try:
             ticker = ticker_info[bot.other_type_of_pair]
         except KeyError as error:
@@ -17,24 +20,30 @@ def strategy(bot):
         ticker_low_day = round(float(ticker["l"][1]), 2)
         average_price = (ticker_low_day + ticker_high_day) / 2
         ticker_current = round(float(ticker["a"][0]), 2)
-        print([ticker_current, " tickercurrent"])
-        print(average_price)
-        if average_price > ticker_current:
-            print("wantu buy")
+        difference = ticker_current - average_price
+        if difference < 0:
             if float(balance[bot.fiat]) > 0.02 / ticker_current:
-                amount_to_buy = float(balance[bot.fiat]) / ticker_current / 100 * bot.risk_management
-                bot.place_order("buy", "limit", ticker_current, amount_to_buy)
-            else:
-                print("no monnai")
+                print("AAA")
+                if average_price / 100 * 98 >= ticker_current:
 
-        elif average_price < ticker_current:
-            print("wantu sell")
+                    amount_to_buy = float(balance[bot.fiat]) / ticker_current / 100 * bot.risk_management
+                    buy_price = ticker_current
+                    print("wantu buy")
+                    bot.place_order("buy", "limit", buy_price - 0.05, amount_to_buy)
+            else:
+                pass
+        elif difference > 0:
+
             print(balance[bot.coin])
             if float(balance[bot.coin]) > 0.02:
-                amount_to_sell = balance[bot.coin]
-                bot.place_order("sell", "limit", ticker_current - 1, amount_to_sell)
+                if average_price / 100 * 102 <= ticker_current:
+                    amount_to_sell = balance[bot.coin]
+                    sell_price = ticker_current
+                    if sell_price > buy_price / 100 * 102:
+                        print("wantu sell")
+                        bot.place_order("sell", "limit", sell_price + 0.05, amount_to_sell)
             else:
-                print("no crypto")
+                pass
 
         else:
             logging.info("current price is exactly the average price of last 24 hours, bruh moment")
