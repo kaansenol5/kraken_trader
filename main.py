@@ -26,6 +26,7 @@ class TraderBot():
         self.profit = int(config["profit"])
         self.leverage = int(config["leverage"])
         self.other_type_of_pair = f"X{config['coin']}Z{config['fiat']}"
+        self.risk_management = config["risk_management"]
         print(self.check_balance())
         logging.info("Bot init complete")
         self.main()
@@ -68,9 +69,9 @@ class TraderBot():
             return result["error"]
 
 
-    def place_order(self, type, order_type, price, volume, leverage, expire_time="0"):
-        result = self.kraken.query_private("AddOrder",{"pair":self.pair,"type":type, "ordertype":order_type, "price":price, "volume":volume, "expiretm":expire_time,"leverage":leverage})
-        logging.info(f"Tried to place {self.pair} order. Type: {type}, Ordertype: {order_type}, Price: {price}, volume: {volume}. Expires in {expire_time} seconds. Transaction id: {result['result']}")
+    def place_order(self, type, order_type, price, volume, expire_time="0"):
+        result = self.kraken.query_private("AddOrder",{"pair":self.pair,"type":type, "ordertype":order_type, "price":price, "volume":volume, "expiretm":expire_time})
+        logging.info(f"Tried to place {self.pair} order. Type: {type}, Ordertype: {order_type}, Price: {price}, volume: {volume}. Expires in {expire_time} seconds.")
         try:
             return result["result"]
         except KeyError:
@@ -96,14 +97,14 @@ class TraderBot():
             if self.check_open_orders() == {}:
                 if float(balance[self.fiat]) > 25:
 
-                    buy_volume = float(balance[self.fiat]) / ticker_price * self.leverage
+                    buy_volume = float(balance[self.fiat]) / ticker_price * self.leverage / 100 * self.risk_management
                     buy_price = round(ticker_price - ticker_price / 100 * self.profit, 2)
 
                     sell_price = round(buy_price + buy_price / 100 * self.profit, 2 )
                     stop_loss_price = round(buy_price - buy_price / 100 * 4, 2)
 
                     coin_balance_pre_buy = balance[self.coin]
-                    buy_order = self.place_order("buy", "limit", buy_price, buy_volume, self.leverage, expire_time="+900")
+                    buy_order = self.place_order("buy", "limit", buy_price, buy_volume, expire_time="+900")
                     print("buy placed")
                     buy_order_transaction_id = buy_order["txid"][0]
                     print(buy_order_transaction_id)
@@ -121,7 +122,7 @@ class TraderBot():
                         if coin_balance > coin_balance_pre_buy:
                             logging.info("Buy order seems to be filled, a sell order will be placed")
                             print(coin_balance)
-                            sell_order = self.place_order("sell", "limit", sell_price, coin_balance, self.leverage)
+                            sell_order = self.place_order("sell", "limit", sell_price, coin_balance )
                             sell_order_transaction_id = sell_order["txid"][0]
                             print("sell placed")
 
@@ -131,7 +132,7 @@ class TraderBot():
 
                                 else:
                                     self.cancel_order(sell_order_transaction_id)
-                                    self.place_order("sell","stop-loss",stop_loss_price / 100 * 98, coin_balance, self.leverage)
+                                    self.place_order("sell","stop-loss",stop_loss_price / 100 * 98, coin_balance)
                                     print("stop loss'ed")
                                 time.sleep(4)
                         else:

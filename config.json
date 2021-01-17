@@ -1,6 +1,7 @@
 {
   "coin": "ETH",
   "fiat": "USD",
-  "leverage": "2",
-  "profit": 1
+  "leverage": 1,
+  "profit": 0,
+  "risk_management": 100
 }
