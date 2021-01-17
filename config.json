@@ -3,5 +3,6 @@
   "fiat": "USD",
   "leverage": 1,
   "profit": 1,
-  "risk_management": 100
+  "risk_management": 100,
+  "strategy_to_use": "strategy_2"
 }

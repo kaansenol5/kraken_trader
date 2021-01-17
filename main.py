@@ -5,6 +5,7 @@ import time
 import json
 import logging
 import strategies.strategy_1
+import strategies.strategy_2
 open("log.txt","w+").close()
 logging.basicConfig(format="%(asctime)s %(message)s", filename='log.txt', level=logging.INFO)
 
@@ -27,9 +28,16 @@ class TraderBot():
         self.leverage = int(config["leverage"])
         self.other_type_of_pair = f"X{config['coin']}Z{config['fiat']}"
         self.risk_management = config["risk_management"]
+        self.strategy_to_use = config["strategy_to_use"]
         print(self.check_balance())
         logging.info("Bot init complete")
-        strategies.strategy_1.strategy(self)
+
+        if self.strategy_to_use == "strategy_1":
+            strategies.strategy_1.strategy(self)
+        elif self.strategy_to_use == "strategy_2":
+            strategies.strategy_2.strategy(self)
+        else:
+            print("No such strategy")
 
     def check_balance(self):
         result = self.kraken.query_private("Balance")
@@ -45,7 +53,7 @@ class TraderBot():
         logging.info(f"Checked {pair}.")
 
         try:
-            return result["result"][self.other_type_of_pair]["a"][0]
+            return result["result"]
         except KeyError:
             if result["error"] == "[EAPI:Rate limit exceeded]":
                 print("rate limited, waiting 15 minutes")
