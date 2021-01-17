@@ -34,7 +34,6 @@ def strategy(bot):
                 pass
         elif difference > 0:
 
-            print(balance[bot.coin])
             if float(balance[bot.coin]) > 0.02:
                 if average_price / 100 * 102 <= ticker_current:
                     amount_to_sell = balance[bot.coin]
