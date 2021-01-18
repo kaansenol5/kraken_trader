@@ -34,12 +34,20 @@ class TraderBot():
         print(self.check_balance())
         logging.info("Bot init complete")
 
-        if self.strategy_to_use == "strategy_1":
-            strategies.strategy_1.strategy(self)
-        elif self.strategy_to_use == "strategy_2":
-            strategies.strategy_2.strategy(self)
-        else:
-            print("No such strategy")
+
+        while True:
+            if self.strategy_to_use == "strategy_1":
+                try:
+                    strategies.strategy_1.strategy(self)
+                except Exception as e:
+                    logging.exception(f"\n\n\n ERROR AT {self.strategy_to_use}. ERROR INFO: {e}")
+            elif self.strategy_to_use == "strategy_2":
+                try:
+                    strategies.strategy_2.strategy(self)
+                except Exception as e:
+                    logging.exception(f"\n\n\n ERROR AT {self.strategy_to_use}. ERROR INFO: {e}")
+            else:
+                print("No such strategy")
 
     def check_balance(self):
         result = self.kraken.query_private("Balance")
