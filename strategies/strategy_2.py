@@ -6,7 +6,9 @@ logging.basicConfig(format="%(asctime)s %(message)s", filename='log.txt', level=
 def strategy(bot):
     logging.info("strategy_2 started")
     buy_price = 0
+    i=0
     while True:
+        i+=1
         ticker_info = bot.check_ticker(bot.pair)
         balance = bot.check_balance()
 
@@ -47,5 +49,7 @@ def strategy(bot):
             logging.info("current price is exactly the average price of last 24 hours, bruh moment")
 
         time.sleep(4)
+        if i == 3600:
+            logging.info("bot is still running")
 
 
